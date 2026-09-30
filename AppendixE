@@ -1,0 +1,38 @@
+# Appendix E from graduate thesis
+# Written using R
+
+# Library Set-Up 
+library(raster) 
+library(sp) 
+library(ggplot2) 
+library(ggpp) 
+library(ggpmisc)
+
+# Create Path for Indices in Study Area A 
+studyareaA = list.files(path = "…/studyareaA")
+
+# Read Index X and Y 
+indexX <- raster(x = "…/studyareaA/indexX.tif") 
+indexY <- raster(x = "…/studyareaA/indexY.tif")
+
+# Regression 
+s <- stack(indexX, indexY) 
+v <- data.frame(na.omit(sampleRegular(s, 10000))) 
+names(v) <- c('indexX','indexY') 
+m <- lm(indexY ~ indexX, data=v) 
+m
+
+# Correlation 
+varX <- as.data.frame(na.omit(sampleRegular(indexX, 10000))) 
+varY <- as.data.frame(na.omit(sampleRegular(indexY, 10000))) 
+cor(varY, varX, 
+method = "spearman")
+
+#Scatter Plot 
+p <- as.data.frame(v, xy = TRUE) 
+head(p) 
+ggplot(data=p, aes(x=indexX, y=indexY)) + 
+stat_poly_line() + 
+geom_point() + 
+theme(axis.title.x = element_blank(), axis.title.y = element_blank()) + 
+guides(x = "none", y = "none")
